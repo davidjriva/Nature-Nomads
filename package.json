@@ -15,7 +15,8 @@
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "npx ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundled",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled"
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled",
+    "test": ""
   },
   "author": "David J. Riva",
   "license": "ISC",
