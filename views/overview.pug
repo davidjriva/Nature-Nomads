@@ -1,0 +1,10 @@
+extends base
+
+include components/_overviewCard
+
+block content
+    main.main
+        .card-container
+
+            each tour in tours
+                +overviewCard(tour)

@@ -1,0 +1,25 @@
+doctype html
+html 
+    head 
+        block head
+            meta(charset='UTF-8')
+            meta(name='viewport' content='width=device-width, initial-scale=1.0')
+
+            link(rel='stylesheet' href='/css/style.css')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+
+            title Nature Nomads | #{title}
+
+    body 
+        // HEADER
+        include components/_header
+
+        // CONTENT
+        block content 
+
+        // FOOTER
+        include components/_footer
+
+        // RUN SCRIPT TO LOAD ALL CODE & DEPENDENCIES
+        script(src='/js/bundled/index.js')
