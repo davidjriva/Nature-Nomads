@@ -12,8 +12,6 @@ router.get('/checkout-session/:tourId', bookingController.getCheckoutSession);
 
 router.use(authController.restrictTo('admin', 'lead-guide'));
 
-router.get('/fake-route', bookingController.doSomeAction);
-
 router.route('/:id')
     .get(bookingController.getBooking)
     .patch(bookingController.updateBooking)

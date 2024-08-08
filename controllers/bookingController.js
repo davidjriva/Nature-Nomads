@@ -67,7 +67,3 @@ exports.createBookingManually = factory.createOne(Booking);
 exports.updateBooking = factory.updateOne(Booking);
 
 exports.deleteBooking = factory.deleteOne(Booking);
-
-exports.doSomeAction = (req, res, next) => {
-  next();
-}
