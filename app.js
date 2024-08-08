@@ -4,13 +4,13 @@ const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const cors = require("cors");
 
 const AppError = require(path.join(__dirname, "utils/appError"));
+const xssSanitizer = require(path.join(__dirname, "utils/xssFilters"));
 const globalErrorHandler = require(
   path.join(__dirname, "controllers/errorController")
 );
@@ -72,7 +72,7 @@ app.use(cookieParser()); // Parses the data from cookies [JWT] --> access via 'r
 app.use(mongoSanitize());
 
 // Data sanitization against XSS attacks
-app.use(xss());
+app.use(xssSanitizer);
 
 // Prevent parameter pollution
 app.use(
