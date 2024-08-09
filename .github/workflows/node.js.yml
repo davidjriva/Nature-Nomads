@@ -33,11 +33,5 @@ jobs:
         run: |
           node --version
           npm --version
-      - name: Check MongoDB connection
-        run: |
-          mongo --eval "db.stats()" || echo "MongoDB is not accessible"
-      - name: Check MongoDB in-memory server status
-        run: |
-          npm run mongodb-memory-server --status
       - name: Run Jest Tests
         run: npm test --verbose
