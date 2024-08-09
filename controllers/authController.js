@@ -11,7 +11,9 @@ const AppError = require(path.join(__dirname, './../utils/appError'));
 const Email = require(path.join(__dirname, './../utils/email'));
 
 const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 };
 
 const createAndSendToken = (res, req, user, statusCode, data) => {
@@ -35,9 +37,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
   // Send a welcome email to the new user
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  const welcomeEmail = new Email(newUser, url);
-  await welcomeEmail.sendWelcome();
+  if (process.env.NODE_ENV !== 'test') {
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    const welcomeEmail = new Email(newUser, url);
+    await welcomeEmail.sendWelcome();
+  }
 
   createAndSendToken(res, req, newUser, StatusCodes.CREATED, { newUser });
 });
@@ -94,13 +98,20 @@ exports.protect = catchAsync(async (req, res, next) => {
   const user = await User.findById(decoded.id);
 
   if (!user) {
-    return next(new AppError('No user with a matching ID was located for that JWT.', StatusCodes.UNAUTHORIZED));
+    return next(
+      new AppError('No user with a matching ID was located for that JWT.', StatusCodes.UNAUTHORIZED)
+    );
   }
 
   // 4. Check if user changed password after JWT was issued
   const userChangedPassword = user.changedPasswordAfter(decoded.iat);
   if (userChangedPassword) {
-    return next(new AppError('Password was changed after JWT token was issued. Please login again.', StatusCodes.UNAUTHORIZED));
+    return next(
+      new AppError(
+        'Password was changed after JWT token was issued. Please login again.',
+        StatusCodes.UNAUTHORIZED
+      )
+    );
   }
 
   // 5. Grant access to protected route
@@ -144,7 +155,9 @@ exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles is an array (i.e. ['admin', 'lead-guide']). role='user'
     if (!roles.includes(req.user.role)) {
-      return next(new AppError('You do not have permission to perform this action', StatusCodes.FORBIDDEN));
+      return next(
+        new AppError('You do not have permission to perform this action', StatusCodes.FORBIDDEN)
+      );
     }
 
     next();
@@ -175,7 +188,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
-    return next(new AppError('There was an error sending the email. Try again later!'), StatusCodes.INTERNAL_SERVER_ERROR);
+    return next(
+      new AppError('There was an error sending the email. Try again later!'),
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 });
 
@@ -189,7 +205,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 2.) Set the new password [if token is still valid and user exists]
   if (!user) {
-    return next(new AppError('Password reset token is invalid or has expired', StatusCodes.BAD_REQUEST));
+    return next(
+      new AppError('Password reset token is invalid or has expired', StatusCodes.BAD_REQUEST)
+    );
   }
 
   // 3.) Update user document with changed password and changedPasswordAt property
@@ -208,7 +226,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const { passwordCurrent, password, passwordConfirm } = req.body;
 
   if (!passwordCurrent || !password || !passwordConfirm) {
-    next(new AppError('Please provide a new password, the old password, and a confirmation of the old password', StatusCodes.BAD_REQUEST));
+    next(
+      new AppError(
+        'Please provide a new password, the old password, and a confirmation of the old password',
+        StatusCodes.BAD_REQUEST
+      )
+    );
   }
 
   // 2.) Retrieve user from collection
