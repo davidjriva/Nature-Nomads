@@ -34,7 +34,7 @@ jobs:
           db-connection-env-var: MONGODB_CONNECTION_STRING
           run-command: npm test
           binary-version: 4.0.25
-          instance-dbName: validation
+          instance-dbName: Nature-Nomads
           instance-port: 27017
           instance-storageEngine: wiredTiger
           mongoms-debug: "yes"

@@ -8,7 +8,7 @@ beforeAll(async () => {
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
-    uri = process.MONGODB_CONNECTION_STRING;
+    uri = process.env.MONGODB_CONNECTION_STRING;
   } else {
     mongoServer = await MongoMemoryServer.create();
     uri = mongoServer.getUri();
@@ -25,7 +25,10 @@ beforeAll(async () => {
 afterAll(async () => {
   await closeServer();
   await mongoose.disconnect();
-  await mongoServer.stop();
+  // MongoServer is not instantiated in Github Actions
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 });
 
 module.exports = { mongoServer, mongoose };
