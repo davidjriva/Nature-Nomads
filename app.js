@@ -105,6 +105,11 @@ app.use((req, res, next) => {
 });
 
 // ROUTES
+// test route for seeing if server is running
+app.post("/test-route", (req, res) => {
+  res.status(200).send({});
+});
+
 app.use("/", viewRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/tours", tourRouter);

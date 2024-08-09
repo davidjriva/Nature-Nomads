@@ -46,12 +46,12 @@ const connectDB = async () => {
 const app = require('./app');
 
 let server;
-const startServer = async () => {
+const startServer = async (customPort) => {
   if (process.env.NODE_ENV !== 'test') {
     await connectDB();
   }
 
-  const port = process.env.PORT || 8000;
+  const port = customPort || 0;
   server = app.listen(port, () => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`App running on port ${port}...`);
@@ -89,7 +89,7 @@ const closeServer = async () => {
 };
 
 if (require.main === module) {
-  startServer();
+  startServer(process.env.PORT);
 }
 
 module.exports = { startServer, closeServer };

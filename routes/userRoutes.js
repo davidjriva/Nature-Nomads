@@ -17,11 +17,6 @@ router.get("/logout", authController.logout);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
-// test route for seeing if server is running
-router.post("/test-route", (req, res) => {
-  res.status(200).send({});
-});
-
 // ! - All routes past this point require a user to be logged in - !
 router.use(authController.protect);
 
@@ -40,7 +35,8 @@ router.delete("/deleteMe", userController.deleteMe);
 // !! - All routes past this point require admin privileges - !!
 router.use(authController.restrictTo("admin"));
 
-router.route("/").get(userController.getUsers);
+router.route("/")
+  .get(userController.getUsers);
 
 router
   .route("/:id")
