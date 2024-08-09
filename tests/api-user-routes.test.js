@@ -28,6 +28,5 @@ describe('User Signup POST', () => {
     });
 
     expect(response.statusCode).toBe(201);
-    // expect(response.body.data.user.email).toBe("new_user1234@gmail.com");
   });
 });
