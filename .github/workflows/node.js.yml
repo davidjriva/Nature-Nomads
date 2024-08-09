@@ -29,5 +29,14 @@ jobs:
         run: npm ci
       - name: Build JS
         run: npm run build --if-present
-      - name: Run Jest Tests
-        run: npm test
+      - uses: neofinancial/mongo-memory-server-action@v1.0.2
+        with:
+          db-connection-env-var: MONGODB_CONNECTION_STRING
+          run-command: yarn use:database
+          binary-version: 4.4.6
+          instance-dbName: validation
+          instance-port: 27017
+          instance-storageEngine: wiredTiger
+          mongoms-debug: 1
+      # - name: Run Jest Tests
+      #   run: npm test

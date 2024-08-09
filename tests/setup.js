@@ -6,7 +6,13 @@ let mongoServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
+
+  let uri;
+  if (process.env.MONGODB_CONNECTION_STRING) {
+    uri = process.MONGODB_CONNECTION_STRING;
+  } else{
+    uri = mongoServer.getUri();
+  }
 
   await mongoose.connect(uri, {
     useNewUrlParser: true,
