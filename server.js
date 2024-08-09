@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const path = require('path');
+const mongoose = require("mongoose");
+const path = require("path");
 
-process.on('uncaughtException', (err) => {
-  console.error('UNCAUGHT EXCEPTION. Shutting down...');
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION. Shutting down...");
   console.error(`Name: ${err.name}`);
 
-  if (process.env.NODE_ENV == 'development') {
+  if (process.env.NODE_ENV == "development") {
     console.error(`Message: ${err.message}`);
     console.error(`Stack: ${err.stack}`);
   }
@@ -16,47 +16,80 @@ process.on('uncaughtException', (err) => {
 });
 
 // Reading in environment variables
-const dotenv = require('dotenv');
-dotenv.config({ path: path.join(__dirname, 'config.env') });
+const dotenv = require("dotenv");
+dotenv.config({ path: path.join(__dirname, "config.env") });
 
 // Connection with MongoDB via Mongoose driver
-const DBConnectionStr = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-mongoose
-  .connect(DBConnectionStr, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('DB connection successful');
+const DBConnectionStr = process.env.DATABASE.replace(
+  "<PASSWORD>",
+  process.env.DATABASE_PASSWORD
+);
+
+const connectDB = async () => {
+  try {
+    await mongoose
+      .connect(DBConnectionStr, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      })
+      .then(() => {
+        if (process.env.NODE_ENV === "development") {
+          console.log("DB connection successful");
+        }
+      });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Express app logic
+const app = require("./app");
+
+let server;
+const startServer = async () => {
+  if (process.env.NODE_ENV !== "test") {
+    await connectDB();
+  }
+
+  const port = process.env.PORT || 8000;
+  server = app.listen(port, () => {
+    if (process.env.NODE_ENV === "development") {
+      console.log(`App running on port ${port}...`);
     }
   });
 
-// Express app logic
-const app = require('./app');
+  // Shutdown gracefully
+  process.on("unhandledRejection", (err) => {
+    console.error("UNHANDLED REJECTION. Shutting down...");
+    console.error(err.name, err.message);
 
-const port = process.env.PORT || 8000;
-const server = app.listen(port, () => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`App running on port ${port}...`);
+    server.close(() => {
+      process.exit(1);
+    });
+  });
+
+  // SIGTERM from Heroku [shutdown gracefully]
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received. Shutting down gracefully...");
+
+    server.close(() => {
+      console.log("Process terminated");
+    });
+  });
+};
+
+const closeServer = async () => {
+  if (server) {
+    await new Promise((resolve) => server.close(resolve));
   }
-});
 
-process.on('unhandledRejection', (err) => {
-  console.error('UNHANDLED REJECTION. Shutting down...');
-  console.error(err.name, err.message);
+  if (process.env.NODE_ENV !== "test") {
+    await mongoose.disconnect();
+  }
+};
 
-  server.close(() => {
-    process.exit(1);
-  });
-});
+if (require.main === module) {
+  startServer();
+}
 
-// Handling SIGTERM forced shutdowns from Heroku [deployment]
-// Handles all remaining requests before shutting down
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-
-  server.close(() => {
-    console.log('Process terminated');
-  });
-});
+module.exports = { startServer, closeServer };
