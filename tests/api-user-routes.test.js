@@ -1,8 +1,15 @@
+const mongoose = require('mongoose');
 const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 
 describe('User Signup POST', () => {
+  it('should verify that Mongoose connection is alive', async () => {
+    // Use the Mongoose connection's `readyState` to check connection status
+    const isConnected = mongoose.connection.readyState === 1; // 1 means connected
+    expect(isConnected).toBe(true);
+  });
+
   it('should respond with a 200 status code to verify server is functional', async () => {
     const response = await request(app).post('/api/v1/users/test-route').send();
     expect(response.statusCode).toBe(200);
