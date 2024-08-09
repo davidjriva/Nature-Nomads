@@ -35,13 +35,13 @@ const createAndSendToken = (res, req, user, statusCode, data) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  res.status(201).json({})
+
   // // Send a welcome email to the new user
   // const url = `${req.protocol}://${req.get('host')}/me`;
   // const welcomeEmail = new Email(newUser, url);
   // await welcomeEmail.sendWelcome();
 
-  // createAndSendToken(res, req, newUser, StatusCodes.CREATED, { newUser });
+  createAndSendToken(res, req, newUser, StatusCodes.CREATED, { newUser });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
