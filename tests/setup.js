@@ -18,7 +18,7 @@ beforeAll(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-
+  expect(true).toBe(false);
   await startServer();
 });
 
