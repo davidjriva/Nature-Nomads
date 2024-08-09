@@ -27,13 +27,6 @@ describe('User Signup POST', () => {
       passwordConfirm: 'this_is_my_password',
     });
 
-    console.log(mongoose);
-    console.log('-----------------------');
-    console.log('-----------------------');
-    console.log('-----------------------');
-    console.log('-----------------------');
-    console.log('-----------------------');
-    console.log(response);
     expect(response.statusCode).toBe(201);
     // expect(response.body.data.user.email).toBe("new_user1234@gmail.com");
   });
