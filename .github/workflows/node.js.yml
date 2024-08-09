@@ -32,12 +32,17 @@ jobs:
       - uses: neofinancial/mongo-memory-server-action@v1.0.2
         with:
           db-connection-env-var: MONGODB_CONNECTION_STRING
-          run-command: echo "MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING" && npm test
+          run-command:
           binary-version: 4.0.25
           instance-dbName: Nature-Nomads
           instance-port: 27017
           instance-storageEngine: wiredTiger
-          mongoms-debug: "yes"
+          mongoms-debug: 'yes'
+      - name: Print env variables
+        run: |
+          echo "MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING"
+          echo "NODE_ENV=$NODE_ENV"
+          echo "OTHER_ENV_VAR=$OTHER_ENV_VAR"
 
       # - name: Run Jest Tests
       #   run: npm test
