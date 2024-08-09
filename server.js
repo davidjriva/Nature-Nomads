@@ -20,10 +20,13 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, 'config.env') });
 
 // Connection with MongoDB via Mongoose driver
-const DBConnectionStr = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-
 const connectDB = async () => {
   try {
+    const DBConnectionStr = process.env.DATABASE.replace(
+      '<PASSWORD>',
+      process.env.DATABASE_PASSWORD
+    );
+
     await mongoose
       .connect(DBConnectionStr, {
         useNewUrlParser: true,
