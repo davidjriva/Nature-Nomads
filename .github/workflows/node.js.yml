@@ -33,7 +33,7 @@ jobs:
         with:
           db-connection-env-var: MONGODB_CONNECTION_STRING
           run-command: npm test
-          binary-version: 10.0.0
+          binary-version: 4.0.25
           instance-dbName: validation
           instance-port: 27017
           instance-storageEngine: wiredTiger
