@@ -32,7 +32,7 @@ jobs:
       - uses: neofinancial/mongo-memory-server-action@v1.0.2
         with:
           db-connection-env-var: MONGODB_CONNECTION_STRING
-          run-command:
+          run-command: echo "Hello"
           binary-version: 4.0.25
           instance-dbName: Nature-Nomads
           instance-port: 27017
