@@ -8,6 +8,7 @@ beforeAll(async () => {
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
+    console.log('ENV STRING= ', process.env.MONGODB_CONNECTION_STRING);
     uri = process.env.MONGODB_CONNECTION_STRING;
   } else {
     mongoServer = await MongoMemoryServer.create();
