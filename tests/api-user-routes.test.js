@@ -10,6 +10,10 @@ describe('User Signup POST', () => {
     expect(isConnected).toBe(true);
   });
 
+  it('should verify that the NODE_ENV is test', async () => {
+    expect(process.env.NODE_ENV).toBe('test');
+  });
+
   it('should respond with a 200 status code to verify server is functional', async () => {
     const response = await request(app).post('/api/v1/users/test-route').send();
     expect(response.statusCode).toBe(200);
