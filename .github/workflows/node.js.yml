@@ -12,6 +12,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: testing
+
 
     strategy:
       matrix:
@@ -38,6 +41,10 @@ jobs:
           instance-port: 27017
           instance-storageEngine: ephemeralForTest
           mongoms-debug: 'yes'
-
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+          JWT_COOKIE_EXPIRES_IN: ${{ secrets.JWT_COOKIE_EXPIRES_IN }}
+          
       # - name: Run Jest Tests
       #   run: npm test
