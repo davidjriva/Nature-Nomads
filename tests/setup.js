@@ -5,12 +5,12 @@ const { startServer, closeServer } = require('../server');
 let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
+    // Github actions is running and will provide connection string
     uri = process.MONGODB_CONNECTION_STRING;
-  } else{
+  } else {
+    mongoServer = await MongoMemoryServer.create();
     uri = mongoServer.getUri();
   }
 
