@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
-const path = require("path");
+const mongoose = require('mongoose');
+const path = require('path');
 
-process.on("uncaughtException", (err) => {
-  console.error("UNCAUGHT EXCEPTION. Shutting down...");
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION. Shutting down...');
   console.error(`Name: ${err.name}`);
 
-  if (process.env.NODE_ENV == "development") {
+  if (process.env.NODE_ENV == 'development') {
     console.error(`Message: ${err.message}`);
     console.error(`Stack: ${err.stack}`);
   }
@@ -16,14 +16,11 @@ process.on("uncaughtException", (err) => {
 });
 
 // Reading in environment variables
-const dotenv = require("dotenv");
-dotenv.config({ path: path.join(__dirname, "config.env") });
+const dotenv = require('dotenv');
+dotenv.config({ path: path.join(__dirname, 'config.env') });
 
 // Connection with MongoDB via Mongoose driver
-const DBConnectionStr = process.env.DATABASE.replace(
-  "<PASSWORD>",
-  process.env.DATABASE_PASSWORD
-);
+const DBConnectionStr = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 const connectDB = async () => {
   try {
@@ -33,8 +30,8 @@ const connectDB = async () => {
         useUnifiedTopology: true,
       })
       .then(() => {
-        if (process.env.NODE_ENV === "development") {
-          console.log("DB connection successful");
+        if (process.env.NODE_ENV === 'development') {
+          console.log('DB connection successful');
         }
       });
   } catch (err) {
@@ -43,24 +40,24 @@ const connectDB = async () => {
 };
 
 // Express app logic
-const app = require("./app");
+const app = require('./app');
 
 let server;
 const startServer = async () => {
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV !== 'test') {
     await connectDB();
   }
 
   const port = process.env.PORT || 8000;
   server = app.listen(port, () => {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       console.log(`App running on port ${port}...`);
     }
   });
 
   // Shutdown gracefully
-  process.on("unhandledRejection", (err) => {
-    console.error("UNHANDLED REJECTION. Shutting down...");
+  process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION. Shutting down...');
     console.error(err.name, err.message);
 
     server.close(() => {
@@ -69,11 +66,11 @@ const startServer = async () => {
   });
 
   // SIGTERM from Heroku [shutdown gracefully]
-  process.on("SIGTERM", () => {
-    console.log("SIGTERM received. Shutting down gracefully...");
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
 
     server.close(() => {
-      console.log("Process terminated");
+      console.log('Process terminated');
     });
   });
 };
@@ -83,7 +80,7 @@ const closeServer = async () => {
     await new Promise((resolve) => server.close(resolve));
   }
 
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV !== 'test') {
     await mongoose.disconnect();
   }
 };
