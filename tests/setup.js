@@ -14,10 +14,7 @@ beforeAll(async () => {
     uri = mongoServer.getUri();
   }
 
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(uri);
 
   await startServer();
 });

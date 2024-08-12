@@ -21,8 +21,6 @@ const DBConnectionStr = process.env.DATABASE.replace('<PASSWORD>', process.env.D
 mongoose
   .connect(DBConnectionStr, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
     useUnifiedTopology: true,
   })
   .then(() => {

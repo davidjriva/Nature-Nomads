@@ -28,10 +28,7 @@ const connectDB = async () => {
     );
 
     await mongoose
-      .connect(DBConnectionStr, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
+      .connect(DBConnectionStr)
       .then(() => {
         if (process.env.NODE_ENV === 'development') {
           console.log('DB connection successful');
