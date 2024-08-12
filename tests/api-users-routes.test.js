@@ -3,7 +3,7 @@ const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const User = require(path.join(__dirname, '../models/userModel'));
 
-describe('User /signup POST', () => {
+describe('User Routes', () => {
   let JWT_TOKEN;
   let userId;
   let secondUserId;

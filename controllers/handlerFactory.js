@@ -11,19 +11,29 @@ exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id);
 
-    if (!doc) return next(new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND));
+    if (!doc)
+      return next(
+        new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND)
+      );
 
     sendResponse(res, StatusCodes.NO_CONTENT, null);
   });
 
 exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!doc) return next(new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND));
+    if (!doc)
+      return next(
+        new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND)
+      );
 
     sendResponse(res, StatusCodes.OK, doc);
   });
+1;
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -42,7 +52,9 @@ exports.getOne = (Model, populateOptions) =>
     const doc = await query;
 
     if (!doc) {
-      return next(new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND));
+      return next(
+        new AppError(`No document found with the ID ${req.params.id}`, StatusCodes.NOT_FOUND)
+      );
     }
 
     sendResponse(res, StatusCodes.OK, doc);
@@ -53,7 +65,11 @@ exports.getAll = (Model) =>
     let filter = {};
     if (req.params.tourId) filter = { tour: req.params.tourId };
 
-    const features = new APIFeatures(Model.find(filter), req.query).filter().sort().limitFields().paginate();
+    const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
     // Measuring query performance -> add the .explain() modifier to the query and it will return performance details to the endpoint
     const docs = await features.query;
