@@ -147,6 +147,4 @@ describe('Tour Routes', () => {
       expect(getRes.statusCode).toBe(404);
     });
   });
-
-  // TEST
 });
