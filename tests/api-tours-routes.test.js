@@ -71,8 +71,19 @@ describe('Tour Routes', () => {
   });
 
   describe('GET /', () => {
-    it('should get all tours and return a 200 status code', () => {
-      expect(true).toBe(true);
+    it('should get all tours and return a 200 status code', async () => {
+      const res = await request(app).get('/api/v1/tours');
+
+      expect(res.statusCode).toBe(200);
+      expect(Array.isArray(res.body.data.docs)).toBe(true);
+      expect(res.body.data.results).toBe(9);
+
+      const firstTour = res.body.data.docs[0];
+      expect(firstTour).toHaveProperty('name');
+      expect(firstTour).toHaveProperty('duration');
+      expect(firstTour).toHaveProperty('summary');
+      expect(firstTour).toHaveProperty('locations');
+      expect(firstTour).toHaveProperty('images');
     });
   });
 
