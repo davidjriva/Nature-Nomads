@@ -160,7 +160,7 @@ describe('User Routes', () => {
       ];
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.results.length >= 2).toBe(true);
+      expect(res.body.data.results.length).toBeGreaterThanOrEqual(2);
       expect(res.body.data.docs).toEqual(
         expect.arrayContaining(
           expectedUsers.map((user) =>
