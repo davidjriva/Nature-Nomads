@@ -36,26 +36,37 @@ describe('Tour Routes', () => {
   });
 
   describe('POST /', () => {
-    it('should create all tours in the dev-data and return a 201 status code', async () => {
-      const createTourReq = await request(app)
-        .post('/api/v1/tours')
-        .send(tours[0])
-        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+    it('should create all tours in the dev-data and return a 201 status code for each', async () => {
+      const reqs = tours.map(async (tour) => {
+        // Make the POST request
+        const createReq = await request(app)
+          .post('/api/v1/tours')
+          .send(tour)
+          .set('Authorization', `Bearer ${JWT_TOKEN}`);
 
-      createdTourId = createTourReq.body.data.id;
+        const updatedTour = {
+          ...tour,
+          locations: tour.locations.map((location) => ({
+            ...location,
+            id: location._id,
+            description: location.description.replace('&', '&amp;'),
+          })),
+        };
 
-      // Adding the `id` field
-      tours[0].locations = tours[0].locations.map((location) => ({
-        ...location,
-        id: location._id,
-      }));
-      expect(createTourReq.statusCode).toBe(201);
-      expect(createTourReq.body.data.name).toBe(tours[0].name);
-      expect(createTourReq.body.data.duration).toBe(tours[0].duration);
-      expect(createTourReq.body.data.summary).toBe(tours[0].summary);
-      expect(createTourReq.body.data.images).toStrictEqual(tours[0].images);
-      expect(createTourReq.body.data.startDates).toStrictEqual(tours[0].startDates);
-      expect(createTourReq.body.data.locations).toStrictEqual(tours[0].locations);
+        return { createReq, updatedTour };
+      });
+
+      const results = await Promise.all(reqs);
+
+      results.forEach(({ createReq, updatedTour }) => {
+        expect(createReq.statusCode).toBe(201);
+        expect(createReq.body.data.name).toBe(updatedTour.name);
+        expect(createReq.body.data.duration).toBe(updatedTour.duration);
+        expect(createReq.body.data.summary).toBe(updatedTour.summary);
+        expect(createReq.body.data.images).toStrictEqual(updatedTour.images);
+        expect(createReq.body.data.startDates).toStrictEqual(updatedTour.startDates);
+        expect(createReq.body.data.locations).toStrictEqual(updatedTour.locations);
+      });
     });
   });
 
