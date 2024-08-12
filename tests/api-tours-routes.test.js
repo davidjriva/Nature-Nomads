@@ -7,6 +7,7 @@ const Tour = require(path.join(__dirname, '../models/tourModel'));
 describe('Tour Routes', () => {
   let JWT_TOKEN;
   let tours;
+  let createdTourId;
 
   beforeAll(() => {
     // Read tour data from the file
@@ -36,7 +37,25 @@ describe('Tour Routes', () => {
 
   describe('POST /', () => {
     it('should create all tours in the dev-data and return a 201 status code', async () => {
-      expect(true).toBe(true);
+      const createTourReq = await request(app)
+        .post('/api/v1/tours')
+        .send(tours[0])
+        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+
+      createdTourId = createTourReq.body.data.id;
+
+      // Adding the `id` field
+      tours[0].locations = tours[0].locations.map((location) => ({
+        ...location,
+        id: location._id,
+      }));
+      expect(createTourReq.statusCode).toBe(201);
+      expect(createTourReq.body.data.name).toBe(tours[0].name);
+      expect(createTourReq.body.data.duration).toBe(tours[0].duration);
+      expect(createTourReq.body.data.summary).toBe(tours[0].summary);
+      expect(createTourReq.body.data.images).toStrictEqual(tours[0].images);
+      expect(createTourReq.body.data.startDates).toStrictEqual(tours[0].startDates);
+      expect(createTourReq.body.data.locations).toStrictEqual(tours[0].locations);
     });
   });
 
