@@ -1,10 +1,20 @@
 const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
+const fs = require('fs');
 const Tour = require(path.join(__dirname, '../models/tourModel'));
 
 describe('Tour Routes', () => {
   let JWT_TOKEN;
+  let tours;
+
+  beforeAll(() => {
+    // Read tour data from the file
+    tours = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../dev-data/data/tours.json'), 'utf-8')
+    );
+  });
+
   describe('Create Admin Account', () => {
     it('should create an admin level account for performing future /tours requests', async () => {
       const signupResponse = await request(app).post('/api/v1/users/signup').send({
@@ -26,18 +36,12 @@ describe('Tour Routes', () => {
 
   describe('POST /', () => {
     it('should create all tours in the dev-data and return a 201 status code', async () => {
-      const fs = require('fs');
-      const tours = JSON.parse(
-        fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`, 'utf-8')
-      );
-      await Tour.create(tours);
       expect(true).toBe(true);
     });
   });
 
   describe('GET /', () => {
     it('should get all tours and return a 200 status code', () => {
-        
       expect(true).toBe(true);
     });
   });

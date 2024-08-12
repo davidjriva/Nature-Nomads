@@ -37,9 +37,10 @@ exports.updateOne = (Model) =>
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
+    console.log(req.body);
     const newDoc = await Model.create(req.body);
 
-    sendResponse(res, StatusCodes.CREATED);
+    sendResponse(res, StatusCodes.CREATED, newDoc);
   });
 
 exports.getOne = (Model, populateOptions) =>
