@@ -2,12 +2,12 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
+const FormData = require('form-data');
 const Tour = require(path.join(__dirname, '../models/tourModel'));
 
 describe('Tour Routes', () => {
   let JWT_TOKEN;
   let tours;
-  let createdTourId;
 
   beforeAll(() => {
     // Read tour data from the file
@@ -88,20 +88,63 @@ describe('Tour Routes', () => {
   });
 
   describe('GET /:id', () => {
-    it('should get a tour by ID and return a 200 status code', () => {
-      expect(true).toBe(true);
+    it('should get a tour by ID and return a 200 status code', async () => {
+      const seaExplorerId = '5c88fa8cf4afda39709c2955';
+
+      const seaExplorerTour = {
+        ...tours[0],
+        locations: tours[0].locations.map((location) => ({
+          ...location,
+          id: location._id,
+        })),
+      };
+
+      const res = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
+
+      expect(res.statusCode).toBe(200);
+
+      expect(res.body.data.name).toBe(seaExplorerTour.name);
+      expect(res.body.data.duration).toBe(seaExplorerTour.duration);
+      expect(res.body.data.summary).toBe(seaExplorerTour.summary);
+      expect(res.body.data.images).toStrictEqual(seaExplorerTour.images);
+      expect(res.body.data.startDates).toStrictEqual(seaExplorerTour.startDates);
+      expect(res.body.data.locations).toStrictEqual(seaExplorerTour.locations);
     });
   });
 
   describe('PATCH /:id', () => {
-    it('should update a tour by ID and return a 200 status code', () => {
-      expect(true).toBe(true);
+    it('should update a tour by ID and return a 200 status code', async () => {
+      const seaExplorerId = '5c88fa8cf4afda39709c2955';
+
+      const patchRes = await request(app)
+        .patch(`/api/v1/tours/${seaExplorerId}`)
+        .send({
+          name: 'My Tour Now',
+        })
+        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+
+      expect(patchRes.statusCode).toBe(200);
+      expect(patchRes.body.data.name).toBe('My Tour Now');
+
+      const getRes = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
+
+      expect(getRes.statusCode).toBe(200);
+      expect(getRes.body.data.name).toBe('My Tour Now');
     });
   });
 
   describe('DELETE /:id', () => {
-    it('should delete a tour by ID and return a 204 status code', () => {
-      expect(true).toBe(true);
+    it('should delete a tour by ID and return a 204 status code', async () => {
+      const seaExplorerId = '5c88fa8cf4afda39709c2955';
+
+      const deleteRes = await request(app)
+        .delete(`/api/v1/tours/${seaExplorerId}`)
+        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+
+      expect(deleteRes.statusCode).toBe(204);
+
+      const getRes = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
+      expect(getRes.statusCode).toBe(404);
     });
   });
 });
