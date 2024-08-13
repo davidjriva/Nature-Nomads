@@ -78,9 +78,7 @@ describe('Tour Routes', () => {
         })),
       };
 
-      const res = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
-
-      expect(res.statusCode).toBe(200);
+      const res = await request(app).get(`/api/v1/tours/${seaExplorerId}`).expect(200);
 
       expect(res.body.data.name).toBe(seaExplorerTour.name);
       expect(res.body.data.duration).toBe(seaExplorerTour.duration);
@@ -100,14 +98,13 @@ describe('Tour Routes', () => {
         .send({
           name: 'My Tour Now',
         })
-        .set('Authorization', `Bearer ${adminUser.token}`);
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
 
-      expect(patchRes.statusCode).toBe(200);
       expect(patchRes.body.data.name).toBe('My Tour Now');
 
-      const getRes = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
+      const getRes = await request(app).get(`/api/v1/tours/${seaExplorerId}`).expect(200);
 
-      expect(getRes.statusCode).toBe(200);
       expect(getRes.body.data.name).toBe('My Tour Now');
     });
   });
@@ -118,12 +115,11 @@ describe('Tour Routes', () => {
 
       const deleteRes = await request(app)
         .delete(`/api/v1/tours/${seaExplorerId}`)
-        .set('Authorization', `Bearer ${adminUser.token}`);
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(204);
 
-      expect(deleteRes.statusCode).toBe(204);
 
-      const getRes = await request(app).get(`/api/v1/tours/${seaExplorerId}`);
-      expect(getRes.statusCode).toBe(404);
+      await request(app).get(`/api/v1/tours/${seaExplorerId}`).expect(404);
     });
   });
 });
