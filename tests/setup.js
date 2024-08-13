@@ -32,13 +32,7 @@ beforeAll(async () => {
   await startServer();
 
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
-  const adminRes = await request(app).post('/api/v1/users/signup').send({
-    email: 'admin@gmail.com',
-    name: 'The Admin',
-    password: 'this_is_my_password',
-    passwordConfirm: 'this_is_my_password',
-    role: 'admin',
-  });
+  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
