@@ -33,7 +33,7 @@ beforeAll(async () => {
 
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
   let adminRes = {};
-  while (!adminRes.body) {
+  while (!(adminRes.body && adminRes.body.data)) {
     adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
   }
 
