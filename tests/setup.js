@@ -15,10 +15,6 @@ const adminUser = {
   role: 'admin',
 };
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 beforeAll(async () => {
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
@@ -35,13 +31,11 @@ beforeAll(async () => {
   // Start Express Server
   await startServer();
 
-  // ------------------------------------
-  // Wait for MongoDB to Fully Initialize
-  // ------------------------------------
-  await sleep(2000);
-
-  // Setup Admin User
-  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+  // Setup Admin User [Wait for MongoDB to Fully Initialize]
+  let adminRes = {};
+  while (!adminRes.body) {
+    adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+  }
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
