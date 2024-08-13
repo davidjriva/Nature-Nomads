@@ -113,13 +113,64 @@ describe('Tour Routes', () => {
     it('should delete a tour by ID and return a 204 status code', async () => {
       const seaExplorerId = '5c88fa8cf4afda39709c2955';
 
-      const deleteRes = await request(app)
+      await request(app)
         .delete(`/api/v1/tours/${seaExplorerId}`)
         .set('Authorization', `Bearer ${adminUser.token}`)
         .expect(204);
 
-
       await request(app).get(`/api/v1/tours/${seaExplorerId}`).expect(404);
+    });
+  });
+});
+
+describe('Booking Routes', () => {
+  describe('GET /checkout-session/:tourId', () => {
+    it('should return a valid booking session and status code 200', async () => {
+      const snowAdventurerId = '5c88fa8cf4afda39709c295a';
+
+      const lookupRes = await request(app).get(`/api/v1/tours/${snowAdventurerId}`).expect(200);
+
+      const snowAdventurerTour = lookupRes.body.data;
+
+      const res = await request(app)
+        .get(`/api/v1/bookings/checkout-session/${snowAdventurerId}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
+
+      const checkoutSession = res.body.data;
+
+      expect(checkoutSession).toHaveProperty('id');
+      expect(checkoutSession.object).toBe('checkout.session');
+      expect(checkoutSession.amount_total).toBe(snowAdventurerTour.price * 100);
+      expect(checkoutSession.currency).toBe('usd');
+      expect(checkoutSession.client_reference_id).toBe(snowAdventurerId);
+      expect(checkoutSession.payment_status).toBe('unpaid');
+      expect(checkoutSession.cancel_url).toContain(`tour/the-snow-adventurer`);
+      expect(checkoutSession.success_url).toContain(`tour=${snowAdventurerId}`);
+      expect(checkoutSession.customer_email).toBe('admin@gmail.com');
+      expect(checkoutSession.payment_method_types).toContain('card');
+    });
+
+    describe('GET /:id', () => {
+      it('should get a booking by ID', async () => {
+        expect(true).toBe(true);
+      });
+    });
+
+    describe('PATCH :/id', () => {
+      expect(true).toBe(true);
+    });
+
+    describe('DELETE /:id', () => {
+      expect(true).toBe(true);
+    });
+
+    describe('GET /', () => {
+      expect(true).toBe(true);
+    });
+
+    describe('POST /', () => {
+      expect(true).toBe(true);
     });
   });
 });
