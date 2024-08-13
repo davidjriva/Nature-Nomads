@@ -15,6 +15,10 @@ const adminUser = {
   role: 'admin',
 };
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 beforeAll(async () => {
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
