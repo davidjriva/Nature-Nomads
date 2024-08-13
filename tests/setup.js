@@ -25,17 +25,14 @@ beforeAll(async () => {
     uri = mongoServer.getUri();
   }
 
-  // Connect to MongoDB
-  await mongoose.connect(uri);
-
   // Start Express Server
   await startServer();
 
+  // Connect to MongoDB
+  await mongoose.connect(uri);
+
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
-  let adminRes = {};
-  while (!(adminRes.body && adminRes.body.data)) {
-    adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
-  }
+  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
