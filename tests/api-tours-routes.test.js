@@ -2,11 +2,9 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
-const FormData = require('form-data');
-const Tour = require(path.join(__dirname, '../models/tourModel'));
+const { adminUser } = require(path.join(__dirname, './setup'));
 
 describe('Tour Routes', () => {
-  let JWT_TOKEN;
   let tours;
 
   beforeAll(() => {
@@ -16,25 +14,6 @@ describe('Tour Routes', () => {
     );
   });
 
-  describe('Create Admin Account', () => {
-    it('should create an admin level account for performing future /tours requests', async () => {
-      const signupResponse = await request(app).post('/api/v1/users/signup').send({
-        email: 'admin@gmail.com',
-        name: 'The Admin',
-        password: 'this_is_my_password',
-        passwordConfirm: 'this_is_my_password',
-        role: 'admin',
-      });
-
-      expect(signupResponse.statusCode).toBe(201);
-      expect(signupResponse.body.data.newUser.email).toBe('admin@gmail.com');
-      expect(signupResponse.body.data.newUser.name).toBe('The Admin');
-      expect(signupResponse.body.data.newUser.role).toBe('admin');
-
-      JWT_TOKEN = signupResponse.body.data.token;
-    });
-  });
-
   describe('POST /', () => {
     it('should create all tours in the dev-data and return a 201 status code for each', async () => {
       const reqs = tours.map(async (tour) => {
@@ -42,7 +21,7 @@ describe('Tour Routes', () => {
         const createReq = await request(app)
           .post('/api/v1/tours')
           .send(tour)
-          .set('Authorization', `Bearer ${JWT_TOKEN}`);
+          .set('Authorization', `Bearer ${adminUser.token}`);
 
         const updatedTour = {
           ...tour,
@@ -121,7 +100,7 @@ describe('Tour Routes', () => {
         .send({
           name: 'My Tour Now',
         })
-        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+        .set('Authorization', `Bearer ${adminUser.token}`);
 
       expect(patchRes.statusCode).toBe(200);
       expect(patchRes.body.data.name).toBe('My Tour Now');
@@ -139,7 +118,7 @@ describe('Tour Routes', () => {
 
       const deleteRes = await request(app)
         .delete(`/api/v1/tours/${seaExplorerId}`)
-        .set('Authorization', `Bearer ${JWT_TOKEN}`);
+        .set('Authorization', `Bearer ${adminUser.token}`);
 
       expect(deleteRes.statusCode).toBe(204);
 

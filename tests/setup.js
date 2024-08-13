@@ -1,8 +1,19 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const path = require('path');
 const { startServer, closeServer } = require('../server');
+const app = require(path.join(__dirname, '../app'));
+const request = require('supertest');
 
 let mongoServer;
+
+const adminUser = {
+  email: 'admin@gmail.com',
+  name: 'The Admin',
+  password: 'this_is_my_password',
+  passwordConfirm: 'this_is_my_password',
+  role: 'admin',
+};
 
 beforeAll(async () => {
   let uri;
@@ -14,9 +25,17 @@ beforeAll(async () => {
     uri = mongoServer.getUri();
   }
 
+  // Connect to MongoDB
   await mongoose.connect(uri);
 
+  // Start Express Server
   await startServer();
+
+  // Setup Admin User
+  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+
+  adminUser._id = adminRes.body.data.newUser._id;
+  adminUser.token = adminRes.body.data.token;
 });
 
 afterAll(async () => {
@@ -28,4 +47,4 @@ afterAll(async () => {
   }
 });
 
-module.exports = { mongoServer, mongoose };
+module.exports = { mongoServer, mongoose, adminUser };
