@@ -32,10 +32,20 @@ beforeAll(async () => {
   await startServer();
 
   // Setup Admin User
-  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+  try {
+    const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+    console.log('Admin Response:', adminRes.body); // Log the entire response for debugging
 
-  adminUser._id = adminRes.body.data.newUser._id;
-  adminUser.token = adminRes.body.data.token;
+    if (adminRes.body && adminRes.body.data) {
+      adminUser._id = adminRes.body.data.newUser._id;
+      adminUser.token = adminRes.body.data.token;
+    } else {
+      throw new Error('Invalid response structure from signup endpoint');
+    }
+  } catch (error) {
+    console.error('Error setting up admin user:', error);
+    throw error; // Rethrow the error to fail the test setup
+  }
 });
 
 afterAll(async () => {
