@@ -103,11 +103,13 @@ app.use((req, res, next) => {
 
 // ROUTES
 // test route for seeing if server is running
+app.use('/', viewRouter);
 app.post('/test-route', (req, res) => {
   res.status(200).send({});
 });
-
-app.use('/', viewRouter);
+app.get('/ping-route', (req, res) => {
+  res.status(200).send({ ping: 'pong' });
+});
 app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

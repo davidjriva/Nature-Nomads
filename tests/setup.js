@@ -15,8 +15,13 @@ const adminUser = {
   role: 'admin',
 };
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 beforeAll(async () => {
-  console.log("YOYOYO ABCDEFG");
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
@@ -32,12 +37,17 @@ beforeAll(async () => {
   // Start Express Server
   await startServer();
 
+  sleep(2000);
+  
+  // Ping server
+  await request(app).get('/ping-route').expect(200);
+
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
-});
+}, 10000);
 
 afterAll(async () => {
   await closeServer();
