@@ -47,3 +47,4 @@ jobs:
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
           JWT_COOKIE_EXPIRES_IN: ${{ secrets.JWT_COOKIE_EXPIRES_IN }}
           ACTIONS_RUNNER_DEBUG: true
+          DEBUG: '*'
