@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const path = require('path');
+const { error } = require('console');
 
+/*
+  --------------
+  Error Handling
+  --------------
+*/
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION. Shutting down...');
   console.error(`Name: ${err.name}`);
@@ -15,6 +21,23 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION. Shutting down...');
+  console.error(err.name, err.message);
+
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
 // Reading in environment variables
 const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, 'config.env') });
@@ -27,13 +50,11 @@ const connectDB = async () => {
       process.env.DATABASE_PASSWORD
     );
 
-    await mongoose
-      .connect(DBConnectionStr)
-      .then(() => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('DB connection successful');
-        }
-      });
+    await mongoose.connect(DBConnectionStr).then(() => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('DB connection successful');
+      }
+    });
   } catch (err) {
     console.error(err);
   }
@@ -44,34 +65,25 @@ const app = require('./app');
 
 let server;
 const startServer = async (customPort) => {
+  error(`Starting server -- ${Date.now()}`);
   if (process.env.NODE_ENV !== 'test') {
     await connectDB();
   }
 
   const port = customPort || 0;
-  server = app.listen(port, () => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`App running on port ${port}...`);
-    }
-  });
-
-  // Shutdown gracefully
-  process.on('unhandledRejection', (err) => {
-    console.error('UNHANDLED REJECTION. Shutting down...');
-    console.error(err.name, err.message);
-
-    server.close(() => {
-      process.exit(1);
-    });
-  });
-
-  // SIGTERM from Heroku [shutdown gracefully]
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM received. Shutting down gracefully...');
-
-    server.close(() => {
-      console.log('Process terminated');
-    });
+  // Return a promise that resolves when the server starts listening
+  return new Promise((resolve, reject) => {
+    server = app
+      .listen(port, () => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`App running on port ${port}...`);
+        }
+        error(`Server started listening -- ${Date.now()}`);
+        resolve(server);
+      })
+      .on('error', (err) => {
+        reject(err);
+      });
   });
 };
 
@@ -86,7 +98,10 @@ const closeServer = async () => {
 };
 
 if (require.main === module) {
-  startServer(process.env.PORT);
+  startServer(process.env.PORT).catch((err) => {
+    console.error('Error starting server:', err);
+    process.exit(1);
+  });
 }
 
 module.exports = { startServer, closeServer };
