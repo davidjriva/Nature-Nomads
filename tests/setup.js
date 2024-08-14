@@ -43,16 +43,11 @@ beforeAll(async () => {
   // Ping server
   await request(app).get('/ping-route').expect(200);
 
-  // Sleep
-  await sleep(2 * 1000);
-
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
-  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
 
-  await sleep(2 * 1000);
-
+  error('BODY [NEWUSER]= ', adminRes.body.data.newUser);
   error('123-CODE= ', adminRes.statusCode);
-  // error('adminRes= ', adminRes);
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
