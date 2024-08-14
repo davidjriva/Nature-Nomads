@@ -18,12 +18,6 @@ const adminUser = {
   role: 'admin',
 };
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 beforeAll(async () => {
   error("hello from actions using -> {error} = require('console') ☝️😎☝️");
 
@@ -42,13 +36,13 @@ beforeAll(async () => {
   // Start Express Server
   await startServer();
 
-  sleep(2000);
-
   // Ping server
   await request(app).get('/ping-route').expect(200);
 
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
-  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
+  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser);
+
+  expect(adminRes.statusCode).toBe(201);
 
   error('STATUS-CODE= ', adminRes.statusCode);
   error('adminRes= ', adminRes);
