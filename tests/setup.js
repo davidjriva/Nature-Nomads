@@ -52,7 +52,6 @@ beforeAll(async () => {
 
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
-
   error('BODY [NEWUSER]= ', adminRes.body.data.newUser);
   error('123-CODE= ', adminRes.statusCode);
 
