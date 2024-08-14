@@ -50,7 +50,9 @@ beforeAll(async () => {
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
 
+  error('STATUS-CODE= ', adminRes.statusCode);
   error('adminRes= ', adminRes);
+
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
 }, 10000);
