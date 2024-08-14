@@ -17,19 +17,14 @@ module.exports = async function (globalConfig, projectConfig) {
   // Configure environment variable
   dotenv.config({ path: path.join(__dirname, '../config.env') });
 
-  let uri;
-  if (process.env.MONGODB_CONNECTION_STRING) {
-    // Github actions is running and will provide connection string
-    uri = process.env.MONGODB_CONNECTION_STRING;
-  } else {
+  if (!process.env.MONGO_URI) {
     globalThis.MONGO_SERVER = await MongoMemoryServer.create();
     uri = MONGO_SERVER.getUri();
+    process.env.MONGO_URI = uri;
   }
 
-  process.env.MONGO_URI = uri;
-
   // Connect to MongoDB
-  await mongoose.connect(uri);
+  await mongoose.connect(process.env.MONGO_URI);
 
   // Setup an admin account
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
