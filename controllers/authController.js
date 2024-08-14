@@ -9,6 +9,7 @@ const sendResponse = require(path.join(__dirname, '../utils/sendResponse'));
 const User = require(path.join(__dirname, './../models/userModel'));
 const AppError = require(path.join(__dirname, './../utils/appError'));
 const Email = require(path.join(__dirname, './../utils/email'));
+const { error } = require('console');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -34,15 +35,19 @@ const createAndSendToken = (res, req, user, statusCode, data) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  error(`Signing up a user ${req.body}`);
   const newUser = await User.create(req.body);
 
+  error(`User signed up! ${newUser}`);
   // Send a welcome email to the new user
   if (process.env.NODE_ENV !== 'test') {
+    error('EMAIL BAD ! 🔥🔥');
     const url = `${req.protocol}://${req.get('host')}/me`;
     const welcomeEmail = new Email(newUser, url);
     await welcomeEmail.sendWelcome();
   }
 
+  error(`Sending a token!`);
   createAndSendToken(res, req, newUser, StatusCodes.CREATED, { newUser });
 });
 
