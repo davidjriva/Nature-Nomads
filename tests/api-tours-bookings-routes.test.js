@@ -3,15 +3,8 @@ const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
 const mongoose = require('mongoose');
-const { error } = require('console');
 
-const adminUser = {
-  email: 'admin-tours-routes@gmail.com',
-  name: 'The Admin',
-  password: 'this_is_my_password',
-  passwordConfirm: 'this_is_my_password',
-  role: 'admin',
-};
+const adminUser = JSON.parse(process.env.ADMIN_USER);
 
 describe('Tour Routes', () => {
   let tours;
@@ -25,15 +18,6 @@ describe('Tour Routes', () => {
 
   afterAll(async () => {
     await mongoose.disconnect();
-  });
-
-  describe('/signup Admin User', () => {
-    it('should create a user with admin privileges and return a 201 status code', async () => {
-      const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
-
-      adminUser._id = adminRes.body.data.newUser._id;
-      adminUser.token = adminRes.body.data.token;
-    });
   });
 
   describe('POST /', () => {
