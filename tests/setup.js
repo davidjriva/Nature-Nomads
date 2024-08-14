@@ -4,8 +4,9 @@ const path = require('path');
 const { startServer, closeServer } = require(path.join(__dirname, '../server'));
 const app = require(path.join(__dirname, '../app'));
 const request = require('supertest');
-const core = require('@actions/core');
-const { log, error } = require('console');
+
+// LOGGING: TO SEE A PRINT IN GITHUB ACTIONS USE THE ERROR FUNCTION
+const { error } = require('console');
 
 let mongoServer;
 
@@ -49,6 +50,7 @@ beforeAll(async () => {
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
 
+  error('adminRes= ', adminRes);
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;
 }, 10000);
