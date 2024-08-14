@@ -22,6 +22,7 @@ function sleep(ms) {
 }
 
 beforeAll(async () => {
+  console.log('FREEDOM');
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
@@ -38,7 +39,7 @@ beforeAll(async () => {
   await startServer();
 
   sleep(2000);
-  
+
   // Ping server
   await request(app).get('/ping-route').expect(200);
 
