@@ -18,10 +18,6 @@ const adminUser = {
   role: 'admin',
 };
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 beforeAll(async () => {
   error("hello from actions using -> {error} = require('console') ☝️😎☝️");
 
