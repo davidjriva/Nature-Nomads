@@ -16,6 +16,7 @@ const adminUser = {
 };
 
 beforeAll(async () => {
+  console.log("YOYOYO ABCDEFG");
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
