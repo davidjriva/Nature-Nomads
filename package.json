@@ -16,7 +16,7 @@
     "debug": "npx ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundled",
     "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled",
-    "test": "NODE_ENV=test jest --verbose --detectOpenHandles --silent=false"
+    "test": "NODE_ENV=test jest --silent=false"
   },
   "author": "David J. Riva",
   "license": "ISC",
