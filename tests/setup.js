@@ -51,9 +51,9 @@ beforeAll(async () => {
   await request(app).get('/ping-route').expect(200);
 
   // Setup Admin User [Wait for MongoDB to Fully Initialize]
+  error('Attempting to sign up admin user...');
   const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
-  error('BODY [NEWUSER]= ', adminRes.body.data.newUser);
-  error('123-CODE= ', adminRes.statusCode);
+  error('Signup response:', adminRes.statusCode, adminRes.body);
 
   adminUser._id = adminRes.body.data.newUser._id;
   adminUser.token = adminRes.body.data.token;

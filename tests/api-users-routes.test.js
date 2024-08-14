@@ -22,9 +22,8 @@ describe('User Routes', () => {
   describe('/signup POST', () => {
     it('should create a new user and return a 201 status code', async () => {
       // Create a second user with different attributes
-      const res = await request(app).post('/api/v1/users/signup').send(secondUser);
+      const res = await request(app).post('/api/v1/users/signup').send(secondUser).expect(201);
 
-      expect(res.statusCode).toBe(201);
       expect(res.body.data.newUser.email).toBe('second_user@gmail.com');
       expect(res.body.data.newUser.name).toBe('User Two');
       expect(res.body.data.newUser.role).toBe('user');
