@@ -9,6 +9,7 @@ const sendResponse = require(path.join(__dirname, '../utils/sendResponse'));
 const User = require(path.join(__dirname, './../models/userModel'));
 const AppError = require(path.join(__dirname, './../utils/appError'));
 const Email = require(path.join(__dirname, './../utils/email'));
+const { error } = require('console');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {

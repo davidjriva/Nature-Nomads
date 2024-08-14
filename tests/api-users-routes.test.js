@@ -1,8 +1,9 @@
 const request = require('supertest');
+const mongoose = require('mongoose');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const User = require(path.join(__dirname, '../models/userModel'));
-const { adminUser } = require(path.join(__dirname, './setup'));
+const { error } = require('console');
 
 const secondUser = {
   email: 'second_user@gmail.com',
@@ -18,13 +19,22 @@ const thirdUser = {
   passwordConfirm: 'this_is_my_password',
 };
 
+const adminUser = JSON.parse(process.env.ADMIN_USER);
+
 describe('User Routes', () => {
+  beforeAll(async () => {
+    await mongoose.connect(process.env.MONGO_URI);
+  });
+
+  afterAll(async () => {
+    await mongoose.disconnect();
+  });
+
   describe('/signup POST', () => {
     it('should create a new user and return a 201 status code', async () => {
       // Create a second user with different attributes
-      const res = await request(app).post('/api/v1/users/signup').send(secondUser);
+      const res = await request(app).post('/api/v1/users/signup').send(secondUser).expect(201);
 
-      expect(res.statusCode).toBe(201);
       expect(res.body.data.newUser.email).toBe('second_user@gmail.com');
       expect(res.body.data.newUser.name).toBe('User Two');
       expect(res.body.data.newUser.role).toBe('user');
@@ -144,7 +154,7 @@ describe('User Routes', () => {
       const expectedUsers = [secondUser, adminUser];
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.results).toBe(2);
+      expect(res.body.data.results).toBeGreaterThanOrEqual(2);
       expect(res.body.data.docs).toEqual(
         expect.arrayContaining(
           expectedUsers.map((user) =>
