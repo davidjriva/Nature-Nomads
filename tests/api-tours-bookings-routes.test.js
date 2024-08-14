@@ -2,6 +2,7 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
+const mongoose = require('mongoose');
 const { error } = require('console');
 
 const adminUser = {
@@ -14,12 +15,16 @@ const adminUser = {
 
 describe('Tour Routes', () => {
   let tours;
-
-  beforeAll(() => {
+  beforeAll(async () => {
+    await mongoose.connect(process.env.MONGO_URI);
     // Read tour data from the file
     tours = JSON.parse(
       fs.readFileSync(path.join(__dirname, '../dev-data/data/tours.json'), 'utf-8')
     );
+  });
+
+  afterAll(async () => {
+    await mongoose.disconnect();
   });
 
   describe('/signup Admin User', () => {
@@ -138,9 +143,7 @@ describe('Tour Routes', () => {
       await request(app).get(`/api/v1/tours/${seaExplorerId}`).expect(404);
     });
   });
-});
 
-describe('Booking Routes', () => {
   const snowAdventurerId = '5c88fa8cf4afda39709c295a';
   const parkCamperId = '5c88fa8cf4afda39709c2961';
   let snowAdventurerBooking;
@@ -151,12 +154,10 @@ describe('Booking Routes', () => {
 
       const snowAdventurerTour = lookupRes.body.data;
 
-      error(`Tour= ${snowAdventurerTour._id}`);
       const res = await request(app)
         .get(`/api/v1/bookings/checkout-session/${snowAdventurerId}`)
         .set('Authorization', `Bearer ${adminUser.token}`)
         .expect(200);
-      error(`Res= status-code(${res.statusCode})`);
 
       const checkoutSession = res.body.data;
 
@@ -171,103 +172,103 @@ describe('Booking Routes', () => {
       expect(checkoutSession.customer_email).toBe(adminUser.email);
       expect(checkoutSession.payment_method_types).toContain('card');
     });
+  });
 
-    describe('POST /', () => {
-      it('should create a booking manually', async () => {
-        const res = await request(app)
-          .post('/api/v1/bookings')
-          .send({
-            paid: true,
-            tour: snowAdventurerId,
-            user: adminUser._id,
-            price: 997,
-          })
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(201);
+  describe('POST /', () => {
+    it('should create a booking manually', async () => {
+      const res = await request(app)
+        .post('/api/v1/bookings')
+        .send({
+          paid: true,
+          tour: snowAdventurerId,
+          user: adminUser._id,
+          price: 997,
+        })
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(201);
 
-        snowAdventurerBooking = res.body.data;
-        expect(snowAdventurerBooking.tour).toBe(snowAdventurerBooking.tour);
-        expect(snowAdventurerBooking.user).toBe(adminUser._id);
-        expect(snowAdventurerBooking.price).toBe(997);
-        expect(snowAdventurerBooking.paid).toBe(true);
-        expect(snowAdventurerBooking).toHaveProperty('_id');
-      });
+      snowAdventurerBooking = res.body.data;
+      expect(snowAdventurerBooking.tour).toBe(snowAdventurerBooking.tour);
+      expect(snowAdventurerBooking.user).toBe(adminUser._id);
+      expect(snowAdventurerBooking.price).toBe(997);
+      expect(snowAdventurerBooking.paid).toBe(true);
+      expect(snowAdventurerBooking).toHaveProperty('_id');
     });
+  });
 
-    describe('GET /:id', () => {
-      it('should get a booking by ID', async () => {
-        const res = await request(app)
-          .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(200);
+  describe('GET /:id', () => {
+    it('should get a booking by ID', async () => {
+      const res = await request(app)
+        .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
 
-        expect(res.body.data._id).toBe(snowAdventurerBooking._id);
-        expect(res.body.data.tour._id).toBe(snowAdventurerBooking.tour);
-        expect(res.body.data.user._id).toBe(snowAdventurerBooking.user);
-        expect(res.body.data.price).toBe(snowAdventurerBooking.price);
-        expect(res.body.data.paid).toBe(true);
-      });
+      expect(res.body.data._id).toBe(snowAdventurerBooking._id);
+      expect(res.body.data.tour._id).toBe(snowAdventurerBooking.tour);
+      expect(res.body.data.user._id).toBe(snowAdventurerBooking.user);
+      expect(res.body.data.price).toBe(snowAdventurerBooking.price);
+      expect(res.body.data.paid).toBe(true);
     });
+  });
 
-    describe('PATCH :/id', () => {
-      it("should manually update a booking's details", async () => {
-        await request(app)
-          .patch(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .send({
-            paid: false,
-          })
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(200);
+  describe('PATCH :/id', () => {
+    it("should manually update a booking's details", async () => {
+      await request(app)
+        .patch(`/api/v1/bookings/${snowAdventurerBooking._id}`)
+        .send({
+          paid: false,
+        })
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
 
-        const lookupRes = await request(app)
-          .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(200);
+      const lookupRes = await request(app)
+        .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
 
-        expect(lookupRes.body.data._id).toBe(snowAdventurerBooking._id);
-        expect(lookupRes.body.data.tour._id).toBe(snowAdventurerBooking.tour);
-        expect(lookupRes.body.data.user._id).toBe(snowAdventurerBooking.user);
-        expect(lookupRes.body.data.price).toBe(snowAdventurerBooking.price);
-        expect(lookupRes.body.data.paid).toBe(false);
-      });
+      expect(lookupRes.body.data._id).toBe(snowAdventurerBooking._id);
+      expect(lookupRes.body.data.tour._id).toBe(snowAdventurerBooking.tour);
+      expect(lookupRes.body.data.user._id).toBe(snowAdventurerBooking.user);
+      expect(lookupRes.body.data.price).toBe(snowAdventurerBooking.price);
+      expect(lookupRes.body.data.paid).toBe(false);
     });
+  });
 
-    describe('GET /', () => {
-      it('should get all bookings', async () => {
-        // create a second booking
-        await request(app)
-          .post('/api/v1/bookings')
-          .send({
-            paid: true,
-            tour: parkCamperId,
-            user: adminUser._id,
-            price: 1500,
-          })
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(201);
+  describe('GET /', () => {
+    it('should get all bookings', async () => {
+      // create a second booking
+      await request(app)
+        .post('/api/v1/bookings')
+        .send({
+          paid: true,
+          tour: parkCamperId,
+          user: adminUser._id,
+          price: 1500,
+        })
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(201);
 
-        // lookup all bookings
-        const allBookingsRes = await request(app)
-          .get('/api/v1/bookings')
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(200);
+      // lookup all bookings
+      const allBookingsRes = await request(app)
+        .get('/api/v1/bookings')
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(200);
 
-        expect(allBookingsRes.body.data.results).toBe(2);
-      });
+      expect(allBookingsRes.body.data.results).toBe(2);
     });
+  });
 
-    describe('DELETE /:id', () => {
-      it('should delete a booking by ID', async () => {
-        await request(app)
-          .delete(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(204);
+  describe('DELETE /:id', () => {
+    it('should delete a booking by ID', async () => {
+      await request(app)
+        .delete(`/api/v1/bookings/${snowAdventurerBooking._id}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(204);
 
-        await request(app)
-          .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminUser.token}`)
-          .expect(404);
-      });
+      await request(app)
+        .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
+        .expect(404);
     });
   });
 });

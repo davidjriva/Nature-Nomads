@@ -10,11 +10,9 @@ const Tour = require(path.join(__dirname, '../models/tourModel'));
 const factory = require(path.join(__dirname, '../controllers/handlerFactory'));
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  error('Getting a checkout session...');
   // Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
 
-  error(`Getting a checkout session for ${tour.name} -- ${tour._id}`);
   // Create checkout session with Stripe
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
