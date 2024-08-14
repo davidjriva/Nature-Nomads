@@ -4,6 +4,7 @@ const path = require('path');
 const { startServer, closeServer } = require(path.join(__dirname, '../server'));
 const app = require(path.join(__dirname, '../app'));
 const request = require('supertest');
+const core = require('@actions/core');
 
 let mongoServer;
 
@@ -22,7 +23,8 @@ function sleep(ms) {
 }
 
 beforeAll(async () => {
-  console.log('FREEDOM');
+  core.info('hello from actions');
+  
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
