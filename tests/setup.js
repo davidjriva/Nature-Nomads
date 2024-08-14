@@ -24,12 +24,7 @@ function sleep(ms) {
 }
 
 beforeAll(async () => {
-  core.info('hello from actions ✨✨✨✨');
-
-  core.debug(`${new Date().toTimeString()} ✨✨✨✨`);
-
-  log('hello from actions 2 ✨✨✨✨');
-  error('hello from actions 3 ✨✨✨✨');
+  error("hello from actions using -> {error} = require('console') ☝️😎☝️");
 
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
