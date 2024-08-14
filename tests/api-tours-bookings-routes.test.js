@@ -2,7 +2,14 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
-const { adminUser } = require(path.join(__dirname, './setup'));
+
+const adminUser = {
+  email: 'admin-bookings-routes@gmail.com',
+  name: 'The Admin',
+  password: 'this_is_my_password',
+  passwordConfirm: 'this_is_my_password',
+  role: 'admin',
+};
 
 describe('Tour Routes', () => {
   let tours;
@@ -12,6 +19,15 @@ describe('Tour Routes', () => {
     tours = JSON.parse(
       fs.readFileSync(path.join(__dirname, '../dev-data/data/tours.json'), 'utf-8')
     );
+  });
+
+  describe('/signup Admin User', () => {
+    it('should create a user with admin privileges and return a 201 status code', async () => {
+      const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
+
+      adminUser._id = adminRes.body.data.newUser._id;
+      adminUser.token = adminRes.body.data.token;
+    });
   });
 
   describe('POST /', () => {
@@ -149,7 +165,7 @@ describe('Booking Routes', () => {
       expect(checkoutSession.payment_status).toBe('unpaid');
       expect(checkoutSession.cancel_url).toContain(`tour/the-snow-adventurer`);
       expect(checkoutSession.success_url).toContain(`tour=${snowAdventurerId}`);
-      expect(checkoutSession.customer_email).toBe('admin@gmail.com');
+      expect(checkoutSession.customer_email).toBe(adminUser.email);
       expect(checkoutSession.payment_method_types).toContain('card');
     });
 

@@ -10,17 +10,7 @@ const { error } = require('console');
 
 let mongoServer;
 
-const adminUser = {
-  email: 'admin@gmail.com',
-  name: 'The Admin',
-  password: 'this_is_my_password',
-  passwordConfirm: 'this_is_my_password',
-  role: 'admin',
-};
-
 beforeAll(async () => {
-  error("hello from actions using -> {error} = require('console') ☝️😎☝️");
-
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
@@ -45,15 +35,7 @@ beforeAll(async () => {
 
   // Ping server
   await request(app).get('/ping-route').expect(200);
-
-  // Setup Admin User [Wait for MongoDB to Fully Initialize]
-  // error('Attempting to sign up admin user...');
-  const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
-  // error('Signup response:', adminRes.statusCode, adminRes.body);
-
-  adminUser._id = adminRes.body.data.newUser._id;
-  adminUser.token = adminRes.body.data.token;
-}, 10 * 1000);
+});
 
 afterAll(async () => {
   await closeServer();
@@ -64,4 +46,4 @@ afterAll(async () => {
   }
 });
 
-module.exports = { mongoServer, mongoose, adminUser };
+module.exports = { mongoServer, mongoose };

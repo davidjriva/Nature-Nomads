@@ -2,7 +2,6 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const User = require(path.join(__dirname, '../models/userModel'));
-const { adminUser } = require(path.join(__dirname, './setup'));
 
 const secondUser = {
   email: 'second_user@gmail.com',
@@ -18,7 +17,24 @@ const thirdUser = {
   passwordConfirm: 'this_is_my_password',
 };
 
+const adminUser = {
+  email: 'admin-users-routes@gmail.com',
+  name: 'The Admin',
+  password: 'this_is_my_password',
+  passwordConfirm: 'this_is_my_password',
+  role: 'admin',
+};
+
 describe('User Routes', () => {
+  describe('/signup Admin User', () => {
+    it('should create a user with admin privileges and return a 201 status code', async () => {
+      const adminRes = await request(app).post('/api/v1/users/signup').send(adminUser).expect(201);
+
+      adminUser._id = adminRes.body.data.newUser._id;
+      adminUser.token = adminRes.body.data.token;
+    });
+  });
+
   describe('/signup POST', () => {
     it('should create a new user and return a 201 status code', async () => {
       // Create a second user with different attributes
@@ -143,7 +159,7 @@ describe('User Routes', () => {
       const expectedUsers = [secondUser, adminUser];
 
       expect(res.statusCode).toBe(200);
-      expect(res.body.data.results).toBe(2);
+      expect(res.body.data.results).toBeGreaterThanOrEqual(2);
       expect(res.body.data.docs).toEqual(
         expect.arrayContaining(
           expectedUsers.map((user) =>

@@ -18,40 +18,32 @@ const signToken = (id) => {
 };
 
 const createAndSendToken = (res, req, user, statusCode, data) => {
-  error('Creating token...');
   const token = signToken(user._id);
-  error(`Token=${token}`);
 
   const cookieOptions = {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   };
-  error(`Cookies=${cookieOptions}`);
 
   res.cookie('jwt', token, cookieOptions);
 
   // Remove password from output
   user.password = undefined;
 
-  error(`Sending final response= ${{ token, ...data }}`);
   sendResponse(res, statusCode, { token, ...data });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  error(`Signing up a user ${req.body}`);
   const newUser = await User.create(req.body);
 
-  error(`User signed up! ${newUser}`);
   // Send a welcome email to the new user
   if (process.env.NODE_ENV !== 'test') {
-    error('EMAIL BAD ! 🔥🔥');
     const url = `${req.protocol}://${req.get('host')}/me`;
     const welcomeEmail = new Email(newUser, url);
     await welcomeEmail.sendWelcome();
   }
 
-  error(`Sending a token!`);
   createAndSendToken(res, req, newUser, StatusCodes.CREATED, { newUser });
 });
 
