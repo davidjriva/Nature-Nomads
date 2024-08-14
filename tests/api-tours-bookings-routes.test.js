@@ -140,26 +140,10 @@ describe('Tour Routes', () => {
   });
 });
 
-const adminBookingsUser = {
-  email: 'admin-bookings-routes@gmail.com',
-  name: 'The Admin',
-  password: 'this_is_my_password',
-  passwordConfirm: 'this_is_my_password',
-  role: 'admin',
-};
 describe('Booking Routes', () => {
   const snowAdventurerId = '5c88fa8cf4afda39709c295a';
   const parkCamperId = '5c88fa8cf4afda39709c2961';
   let snowAdventurerBooking;
-
-  describe('/signup Admin User', () => {
-    it('should create a user with admin privileges and return a 201 status code', async () => {
-      const adminRes = await request(app).post('/api/v1/users/signup').send(adminBookingsUser).expect(201);
-
-      adminBookingsUser._id = adminRes.body.data.newUser._id;
-      adminBookingsUser.token = adminRes.body.data.token;
-    });
-  });
 
   describe('GET /checkout-session/:tourId', () => {
     it('should return a valid booking session and status code 200', async () => {
@@ -170,7 +154,7 @@ describe('Booking Routes', () => {
       error(`Tour= ${snowAdventurerTour._id}`);
       const res = await request(app)
         .get(`/api/v1/bookings/checkout-session/${snowAdventurerId}`)
-        .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+        .set('Authorization', `Bearer ${adminUser.token}`)
         .expect(200);
       error(`Res= status-code(${res.statusCode})`);
 
@@ -184,7 +168,7 @@ describe('Booking Routes', () => {
       expect(checkoutSession.payment_status).toBe('unpaid');
       expect(checkoutSession.cancel_url).toContain(`tour/the-snow-adventurer`);
       expect(checkoutSession.success_url).toContain(`tour=${snowAdventurerId}`);
-      expect(checkoutSession.customer_email).toBe(adminBookingsUser.email);
+      expect(checkoutSession.customer_email).toBe(adminUser.email);
       expect(checkoutSession.payment_method_types).toContain('card');
     });
 
@@ -195,15 +179,15 @@ describe('Booking Routes', () => {
           .send({
             paid: true,
             tour: snowAdventurerId,
-            user: adminBookingsUser._id,
+            user: adminUser._id,
             price: 997,
           })
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(201);
 
         snowAdventurerBooking = res.body.data;
         expect(snowAdventurerBooking.tour).toBe(snowAdventurerBooking.tour);
-        expect(snowAdventurerBooking.user).toBe(adminBookingsUser._id);
+        expect(snowAdventurerBooking.user).toBe(adminUser._id);
         expect(snowAdventurerBooking.price).toBe(997);
         expect(snowAdventurerBooking.paid).toBe(true);
         expect(snowAdventurerBooking).toHaveProperty('_id');
@@ -214,7 +198,7 @@ describe('Booking Routes', () => {
       it('should get a booking by ID', async () => {
         const res = await request(app)
           .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(200);
 
         expect(res.body.data._id).toBe(snowAdventurerBooking._id);
@@ -232,12 +216,12 @@ describe('Booking Routes', () => {
           .send({
             paid: false,
           })
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(200);
 
         const lookupRes = await request(app)
           .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(200);
 
         expect(lookupRes.body.data._id).toBe(snowAdventurerBooking._id);
@@ -256,16 +240,16 @@ describe('Booking Routes', () => {
           .send({
             paid: true,
             tour: parkCamperId,
-            user: adminBookingsUser._id,
+            user: adminUser._id,
             price: 1500,
           })
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(201);
 
         // lookup all bookings
         const allBookingsRes = await request(app)
           .get('/api/v1/bookings')
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(200);
 
         expect(allBookingsRes.body.data.results).toBe(2);
@@ -276,12 +260,12 @@ describe('Booking Routes', () => {
       it('should delete a booking by ID', async () => {
         await request(app)
           .delete(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(204);
 
         await request(app)
           .get(`/api/v1/bookings/${snowAdventurerBooking._id}`)
-          .set('Authorization', `Bearer ${adminBookingsUser.token}`)
+          .set('Authorization', `Bearer ${adminUser.token}`)
           .expect(404);
       });
     });
