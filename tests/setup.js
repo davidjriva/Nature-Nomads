@@ -52,7 +52,7 @@ beforeAll(async () => {
   await sleep(2 * 1000);
   expect(adminRes.statusCode).toBe(201);
 
-  // error('STATUS-CODE= ', adminRes.statusCode);
+  error('123-CODE= ', adminRes.statusCode);
   // error('adminRes= ', adminRes);
 
   adminUser._id = adminRes.body.data.newUser._id;
