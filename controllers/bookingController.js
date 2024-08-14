@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const path = require('path');
+const { error } = require('console');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const sendResponse = require(path.join(__dirname, '../utils/sendResponse'));
@@ -7,7 +8,6 @@ const catchAsync = require(path.join(__dirname, '../utils/catchAsync'));
 const Booking = require(path.join(__dirname, '../models/bookingModel'));
 const Tour = require(path.join(__dirname, '../models/tourModel'));
 const factory = require(path.join(__dirname, '../controllers/handlerFactory'));
-const { error } = require('console');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   error('Getting a checkout session...');
