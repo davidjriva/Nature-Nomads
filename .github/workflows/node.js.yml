@@ -42,7 +42,6 @@ jobs:
           instance-dbName: Nature-Nomads
           instance-port: 27017
           instance-storageEngine: ephemeralForTest
-          mongoms-debug: 'yes'
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
