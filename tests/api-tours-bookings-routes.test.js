@@ -2,6 +2,7 @@ const request = require('supertest');
 const path = require('path');
 const app = require(path.join(__dirname, '../app'));
 const fs = require('fs');
+const { error } = require('console');
 
 const adminUser = {
   email: 'admin-bookings-routes@gmail.com',
@@ -150,10 +151,12 @@ describe('Booking Routes', () => {
 
       const snowAdventurerTour = lookupRes.body.data;
 
+      error(`Tour= ${snowAdventurerTour._id}`);
       const res = await request(app)
         .get(`/api/v1/bookings/checkout-session/${snowAdventurerId}`)
         .set('Authorization', `Bearer ${adminUser.token}`)
         .expect(200);
+      error(`Res= status-code(${res.statusCode})`);
 
       const checkoutSession = res.body.data;
 

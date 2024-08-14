@@ -11,6 +11,7 @@ const { error } = require('console');
 let mongoServer;
 
 beforeAll(async () => {
+  error("Hello from Github Actions using --> { error } = require('console')");
   let uri;
   if (process.env.MONGODB_CONNECTION_STRING) {
     // Github actions is running and will provide connection string
