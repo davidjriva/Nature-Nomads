@@ -37,8 +37,15 @@ beforeAll(async () => {
   // Connect to MongoDB
   await mongoose.connect(uri);
 
+  const isConnected = mongoose.connection.readyState === 1; // 1 means connected
+  expect(isConnected).toBe(true);
+
   // Start Express Server
   await startServer();
+
+  // Test server is functional
+  const response = await request(app).post('/test-route').send();
+  expect(response.statusCode).toBe(200);
 
   // Ping server
   await request(app).get('/ping-route').expect(200);
