@@ -3,7 +3,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const path = require('path');
 const dotenv = require('dotenv');
 const request = require('supertest');
-const app = require(path.join(__dirname, '../app'));
+const app = require(path.join(__dirname, '../../app'));
 
 const adminUser = {
   email: 'admin-users-routes@gmail.com',
@@ -15,7 +15,7 @@ const adminUser = {
 
 module.exports = async function (globalConfig, projectConfig) {
   // Configure environment variable
-  dotenv.config({ path: path.join(__dirname, '../config.env') });
+  dotenv.config({ path: path.join(__dirname, '../../config.env') });
 
   if (!process.env.MONGO_URI) {
     globalThis.MONGO_SERVER = await MongoMemoryServer.create();

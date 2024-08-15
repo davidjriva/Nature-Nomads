@@ -2,6 +2,6 @@ module.exports = {
   verbose: true,
   setupFiles: ['dotenv/config'],
   testEnvironment: 'node',
-  globalSetup: '<rootDir>/tests/globalSetup.js',
-  globalTeardown: '<rootDir>/tests/globalTeardown.js',
+  globalSetup: '<rootDir>/tests/setup/globalSetup.js',
+  globalTeardown: '<rootDir>/tests/setup/globalTeardown.js',
 };
