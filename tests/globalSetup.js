@@ -23,6 +23,8 @@ module.exports = async function (globalConfig, projectConfig) {
     process.env.MONGO_URI = uri;
   }
 
+  //
+
   // Connect to MongoDB
   await mongoose.connect(process.env.MONGO_URI);
 
